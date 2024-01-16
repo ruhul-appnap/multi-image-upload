@@ -1,11 +1,13 @@
+import MultiFileUploader from "./components/MultiFileUploader";
 
 function App() {
-
   return (
     <>
-      <div>hello</div>
+      <div className="h-screen flex items-center justify-center">
+        <MultiFileUploader />
+      </div>
     </>
-  )
+  );
 }
 
-export default App
+export default App;
