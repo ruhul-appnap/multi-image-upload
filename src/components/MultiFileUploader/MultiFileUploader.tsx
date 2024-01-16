@@ -1,14 +1,25 @@
 import React, { useId, useState } from "react";
 
-function MultiFileUploader() {
+type MultiFileUploaderProps = {
+  onUpload: (data: unknown) => void;
+  fileExtensions: string[];
+  maxFiles: number;
+};
+
+function MultiFileUploader({
+  fileExtensions,
+  maxFiles,
+  onUpload,
+}: MultiFileUploaderProps) {
   const id = useId();
+  const acceptFileType = fileExtensions.join(",");
 
   const [fileList, setFileList] = useState<string[]>([]);
 
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     event.preventDefault();
     if (event.target.files) {
-      const files = Array.from(event.target.files);
+      const files = Array.from(event.target.files).slice(0, maxFiles);
       const fileUrl: string[] = [];
 
       for (const file of files) {
@@ -17,7 +28,14 @@ function MultiFileUploader() {
       }
 
       setFileList(fileUrl);
+      onUpload(files);
     }
+  };
+
+  const handleRemoveFile = (id: string) => {
+    const updatedFileList = fileList.filter((file) => file !== id);
+
+    setFileList(updatedFileList);
   };
 
   return (
@@ -25,7 +43,13 @@ function MultiFileUploader() {
       {fileList.length > 0 && (
         <div className="flex space-x-2 flex-wrap items-center my-3">
           {fileList.map((file) => (
-            <div className="w-[7.5rem] h-[7.5rem] rounded-[0.625rem]  shadow-md">
+            <div className="relative w-[7.5rem] h-[7.5rem] rounded-[0.625rem]  shadow-md">
+              <button
+                className="absolute top-0 right-0 border rounded-full w-[28px] h-[28px]  text-sm text-center"
+                onClick={() => handleRemoveFile(file)}
+              >
+                x
+              </button>
               <img
                 src={file}
                 className="rounded-[0.625rem] w-full h-full object-cover"
@@ -46,7 +70,7 @@ function MultiFileUploader() {
         type="file"
         id={id}
         className="hidden"
-        accept="image/*"
+        accept={acceptFileType}
         multiple
         onChange={handleFileUpload}
       />
